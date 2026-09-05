@@ -2,110 +2,84 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-type AuthMode = "signin" | "signup";
-type UserRole = "Employee" | "HR Manager";
-
-export default function AuthPage() {
+export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<AuthMode>("signin");
-  const [role, setRole] = useState<UserRole>("Employee");
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"HR Manager" | "Employee">("HR Manager");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleLogin = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    router.push("/dashboard");
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (role === "HR Manager") {
+      router.push("/dashboard");
+    } else {
+      router.push("/employee-portal");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-hrms-blueGray flex items-center justify-center p-6 bg-[radial-gradient(#0F8B8D15_1px,transparent_1px)] bg-size-[16px_16px]">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-hrms-mediumGray p-8 space-y-6 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-[#17324D] to-[#0F8B8D]" />
-
-        <div className="text-center space-y-1">
-          <h1 className="text-3xl font-extrabold tracking-tight text-hrms-navy">
-            CodeQor HRMS
+    <div className="min-h-screen bg-hrms-blueGray flex flex-col justify-center items-center p-6">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg border border-hrms-mediumGray p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <Link href="/" className="inline-block">
+            <div className="w-12 h-12 rounded-2xl bg-hrms-teal text-white font-extrabold flex items-center justify-center text-xl shadow-md shadow-[#0F8B8D]/20 mx-auto">
+              Q
+            </div>
+          </Link>
+          <h1 className="text-2xl font-extrabold text-hrms-navy tracking-tight">
+            Sign in to CodeQor
           </h1>
           <p className="text-sm text-hrms-darkText opacity-80">
-            {mode === "signin"
-              ? "Welcome back! Please enter your details."
-              : "Create your account to get started."}
+            Select your portal role to access your workspace.
           </p>
         </div>
 
-        <div className="flex bg-hrms-blueGray p-1 rounded-xl border border-hrms-mediumGray">
-          <button
-            type="button"
-            onClick={() => setMode("signin")}
-            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
-              mode === "signin"
-                ? "bg-hrms-navy text-white shadow-sm"
-                : "text-hrms-darkText hover:text-hrms-navy"
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("signup")}
-            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
-              mode === "signup"
-                ? "bg-hrms-navy text-white shadow-sm"
-                : "text-hrms-darkText hover:text-hrms-navy"
-            }`}
-          >
-            Sign Up
-          </button>
-        </div>
-
-        <div className="space-y-2">
-          <label className="block text-xs font-bold uppercase tracking-wider text-hrms-navy">
-            Select Role
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setRole("Employee")}
-              className={`py-2.5 px-4 text-xs font-bold rounded-xl border transition-all ${
-                role === "Employee"
-                  ? "border-hrms-teal bg-hrms-teal/10 text-hrms-teal"
-                  : "border-hrms-mediumGray bg-white text-hrms-darkText hover:border-hrms-teal/50"
-              }`}
-            >
-              Employee
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("HR Manager")}
-              className={`py-2.5 px-4 text-xs font-bold rounded-xl border transition-all ${
-                role === "HR Manager"
-                  ? "border-hrms-teal bg-hrms-teal/10 text-hrms-teal"
-                  : "border-hrms-mediumGray bg-white text-hrms-darkText hover:border-hrms-teal/50"
-              }`}
-            >
-              HR / Admin
-            </button>
+        {error && (
+          <div className="bg-rose-100 border border-rose-300 text-rose-800 text-sm px-4 py-3 rounded-xl">
+            {error}
           </div>
-        </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === "signup" && (
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-hrms-navy mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Sarah Jenkins"
-                className="w-full bg-hrms-blueGray text-hrms-darkText text-sm px-4 py-2.5 rounded-xl border border-transparent focus:border-hrms-teal focus:bg-white focus:outline-none transition-all"
-              />
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-hrms-navy mb-1">
+              Select Portal Role
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setRole("HR Manager")}
+                className={`py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all ${
+                  role === "HR Manager"
+                    ? "bg-hrms-navy text-white border-hrms-navy shadow-md shadow-[#17324D]/20"
+                    : "bg-hrms-blueGray text-hrms-darkText border-hrms-mediumGray hover:bg-white"
+                }`}
+              >
+                HR Manager
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("Employee")}
+                className={`py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all ${
+                  role === "Employee"
+                    ? "bg-hrms-teal text-white border-hrms-teal shadow-md shadow-[#0F8B8D]/20"
+                    : "bg-hrms-blueGray text-hrms-darkText border-hrms-mediumGray hover:bg-white"
+                }`}
+              >
+                Employee
+              </button>
             </div>
-          )}
+          </div>
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-hrms-navy mb-1">
@@ -113,13 +87,14 @@ export default function AuthPage() {
             </label>
             <input
               type="email"
-              required
+              placeholder={
+                role === "HR Manager"
+                  ? "hr.manager@codeqor.com"
+                  : "sarah.jenkins@codeqor.com"
+              }
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={
-                role === "Employee" ? "employee@codeqor.com" : "hr@codeqor.com"
-              }
-              className="w-full bg-hrms-blueGray text-hrms-darkText text-sm px-4 py-2.5 rounded-xl border border-transparent focus:border-hrms-teal focus:bg-white focus:outline-none transition-all"
+              className="w-full bg-hrms-blueGray text-hrms-darkText text-sm px-4 py-3 rounded-xl border border-transparent focus:border-hrms-teal focus:bg-white focus:outline-none transition-all"
             />
           </div>
 
@@ -129,23 +104,29 @@ export default function AuthPage() {
             </label>
             <input
               type="password"
-              required
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-hrms-blueGray text-hrms-darkText text-sm px-4 py-2.5 rounded-xl border border-transparent focus:border-hrms-teal focus:bg-white focus:outline-none transition-all"
+              className="w-full bg-hrms-blueGray text-hrms-darkText text-sm px-4 py-3 rounded-xl border border-transparent focus:border-hrms-teal focus:bg-white focus:outline-none transition-all"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-hrms-teal text-white font-semibold py-3 rounded-xl text-sm hover:opacity-95 transition-opacity shadow-md shadow-[#0F8B8D]/20 mt-2"
+            className="w-full bg-hrms-teal text-white py-3 rounded-xl text-sm font-semibold hover:opacity-95 transition-opacity shadow-lg shadow-[#0F8B8D]/20 mt-2"
           >
-            {mode === "signin"
-              ? `Sign In as ${role}`
-              : `Create ${role} Account`}
+            Login as {role}
           </button>
         </form>
+
+        <div className="text-center pt-2">
+          <Link
+            href="/"
+            className="text-xs font-medium text-hrms-darkText opacity-70 hover:opacity-100"
+          >
+            ← Back to Home
+          </Link>
+        </div>
       </div>
     </div>
   );
